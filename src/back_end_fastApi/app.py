@@ -13,7 +13,7 @@ from scipy import sparse
 # -------------------------------
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DATA_DIR = os.path.join(BASE_DIR, 'data')
-FEATURES_DIR = os.path.join(BASE_DIR, 'src/features')
+FEATURES_DIR = os.path.join(BASE_DIR, 'src/back_end_fastApi/features')
 
 df_projects = pd.read_csv(os.path.join(DATA_DIR, 'projects_translated_fr.csv'))
 df_products = pd.read_csv(os.path.join(DATA_DIR, 'product_cleaned_.csv'))
@@ -42,7 +42,7 @@ class ProductRecommendationRequest(BaseModel):
 
 class ProjectSearchRequest(BaseModel):
     description: str
-    top_n: int = 5
+    top_n: int = 3
 
 # -------------------------------
 # Fonctions pour les recommandations
@@ -78,6 +78,7 @@ def recommend_products(description: str, category: str, budget: Optional[int] = 
         {
             "name": df_products.loc[i, "name"],
             "price": float(df_products.loc[i, "price"]),
+            "link" : df_products.loc[i, "link"],
             "score": sim
         }
         for i, sim in category_similarities[:3]
@@ -96,6 +97,7 @@ def search_projects(description: str, top_n: int):
             "project_name": df_projects.loc[i, "project_name_fr"],
             "description": df_projects.loc[i, "description_fr"],
             "similarity_score": similarities[i],
+            "link": df_projects.loc[i, "link"],
             "components": df_projects.loc[i, "composants_fr"]
         }
         for i in top_indices
