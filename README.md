@@ -43,6 +43,7 @@ source env/bin/activate  # Sur Windows : env\Scripts\activate
 ## Développement Futur
 - Amélioration des algorithmes de recommandation pour une meilleure personnalisation.
 - Intégration de fonctionnalités multilingues.
+- Dockeriser l'application 
 
 ## Contributions
 
