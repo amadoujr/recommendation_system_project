@@ -48,3 +48,7 @@ source env/bin/activate  # Sur Windows : env\Scripts\activate
 ## Contributions
 
 Les contributions sont les bienvenues ! N'hésitez pas à soumettre des issues ou des pull requests pour améliorer le projet.
+
+## Aperçu
+
+![image](https://github.com/amadoujr/recommendation_system_project/blob/main/Capture%20d%E2%80%99e%CC%81cran%202025-01-22%20a%CC%80%2019.35.29.png?raw=true)
