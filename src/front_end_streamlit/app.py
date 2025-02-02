@@ -2,14 +2,22 @@ import streamlit as st
 import requests
 
 
-BASE_URL = "http://webapp_bigdata:8000"
+#BASE_URL = "http://webapp_bigdata:8000"
+BASE_URL = "http://127.0.0.1:8000"
 
 
 def recommend_products_ui():
     st.header("Recommandation de produits robotiques")
-    
+    categories = ['capteur', 'détecteur', 'sonde',
+                 'moteur', 'servomoteur', 'actuateur',
+                 'batterie', 'chargeur',
+                 'câble', 'connecteurs', 'fils', 'adaptateur',
+                 'contrôleur', 'driver', 'controller',
+                 'microcontrôleur', 'arduino', 'raspberry pi',
+                 'affichage', 'lcd', 'écran' 
+                 ]
     description = st.text_area("Description du projet", placeholder="Décrivez votre projet ici...")
-    category = st.text_input("Catégorie", placeholder="Exemple : moteurs, capteurs")
+    category = st.selectbox("Catégorie", categories, placeholder="Sélectionnez une catégorie")
     budget = st.number_input("Budget (€)", min_value=0, step=10)
     
     if st.button("Recommander des produits"):
@@ -24,7 +32,10 @@ def recommend_products_ui():
             recommendations = response.json()
             st.subheader(f"Produits recommandés pour la catégorie '{category}':")
             for product in recommendations.get(category, []):
-                st.write(f"**{product['name']}** - {product['price']}€ - Score : {product['score']:.2f}")
+                if 'name' not in product:
+                    st.write(f"**{product['message']}**")
+                else:
+                    st.write(f"**{product['name']}** - {product['price']}€ - Score : {product['score']:.2f} - [Lien vers le produit]({product['link']})")
         else:
             st.error(f"Erreur : {response.text}")
 
@@ -33,7 +44,7 @@ def search_projects_ui():
     description = st.text_area("Description du projet", placeholder="Décrivez votre projet ici...")
     top_n = st.number_input("Nombre de résultats", min_value=1, max_value=20, step=1, value=5)
 
-    if st.button("chercher les projets similaires"):
+    if st.button("chercher les projets similaires"): 
         if not description:
             st.error("Veuillez fournir une description.")
             return
@@ -45,28 +56,44 @@ def search_projects_ui():
             results = response.json()
             st.subheader("**Projets similaires trouvés :**")
             for project in results:
-                st.write(f"**:red[{project['project_name']}]**")
+                st.write(f"*Nom du projet* : **:red[{project['project_name']}]**")
                 st.write(f"*Description* : {project['description']}")
                 st.write(f"*Composants* : {project['components']}")
+                st.write(f"*Lien vers le projet* : [{project['link']}]({project['link']})")
                 st.write(f"*Score de similarité* : {project['similarity_score']:.2f}")
                 st.markdown("---")
         else:
             st.error(f"Erreur : {response.text}")
-    
 
-def main():
-    st.sidebar.title("Navigation")
-    options = ["Accueil", "Recommander des produits", "Rechercher des projets"]
-    choice = st.sidebar.radio("Choisissez une option :", options)
-    
-    if choice == "Accueil":
-        st.title("Bienvenue sur l'application de recommandation de produits robotiques")
-        st.write("Utilisez les options de la barre latérale pour naviguer.")
-    elif choice == "Recommander des produits":
-        recommend_products_ui()
-    elif choice == "Rechercher des projets":
-        search_projects_ui()
+def accueil():
+    st.title("Bienvenue dans l'univers de la robotique 🤖 !")
+    st.subheader("Votre assistant intelligent pour trouver les meilleurs produits robotiques et projets innovants")
+    st.write("""
+    Cette application est conçue pour vous guider à travers un vaste catalogue de produits robotiques et projets inspirants. 
+    Que vous soyez un passionné de technologie, un étudiant ou un professionnel, vous trouverez ici des recommandations personnalisées 
+    adaptées à vos besoins.
+
+    **Utilisez la barre latérale** pour :
+    - Explorer et rechercher des composants robotiques adaptés à vos projets.
+    - Découvrir des idées de projets innovants pour stimuler votre créativité.
+    - Obtenir des recommandations basées sur vos descriptions et contraintes.
+
+    Prenez part à cette aventure et simplifiez votre processus de conception en un clic ! 😊      
+    """)
+    st.write("""
+    **Source :** Cette application utilise des données collectées à partir de 
+    [Robotshop](https://eu.robotshop.com/fr/collections/pieces-robots) pour les produits robotiques et 
+    [Instructables](https://www.instructables.com/circuits/robots/projects/) pour les projets. Ces sites sont des références 
+    dans le domaine de la robotique et des projets DIY.
+    """)
+
+# Appel dans la navigation
+pg = st.navigation([
+    st.Page(title="Accueil", page=accueil),
+    st.Page(title="Recommander des produits", page=recommend_products_ui),
+    st.Page(title="Rechercher des projets", page=search_projects_ui)
+])
 
 if __name__ == "__main__":
-    main()
+    pg.run()
 
